@@ -31,7 +31,18 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public Employee save(Employee employee) {
         employee.setRole(Role.ROLE_EMPLOYEE);
+        employee.setPassword(passwordEncoder.encode(employee.getPassword()));
         return employeeRepository.save(employee);
+    }
+
+    @Override
+    public Employee update(Employee employee) {
+        return employeeRepository.save(employee);
+    }
+
+    @Override
+    public Optional<Employee> findByAccount(String account) {
+        return employeeRepository.findByAccount(account);
     }
 
     @Override

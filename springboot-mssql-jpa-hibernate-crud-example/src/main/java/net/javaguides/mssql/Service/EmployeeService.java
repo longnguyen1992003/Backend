@@ -14,6 +14,8 @@ public interface EmployeeService {
     Optional<Employee> findById(Long id);
 
     Employee save(Employee employee);
+    Employee update(Employee employee);
+    Optional<Employee> findByAccount(String account);
 
     void deleteById(Long id);
     Employee findEmployeeByAccount(String account);
@@ -22,5 +24,6 @@ public interface EmployeeService {
     List<Employee> employeeSearchWithRoleEmployee(String param);
     List<Employee> getAllEmployeeWithRoleEmployee();
     ListEmployeeResponeDto getAllEmployee(long pageNo,int pageSize,String sortBy,String sortDir);
+
 
 }

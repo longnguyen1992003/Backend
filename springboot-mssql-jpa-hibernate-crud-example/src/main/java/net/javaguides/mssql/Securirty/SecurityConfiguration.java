@@ -65,6 +65,7 @@ public class SecurityConfiguration  {
                 .requestMatchers(new AntPathRequestMatcher("/api/v1/employees/**")).hasAnyAuthority(Role.ROLE_EMPLOYEE.name(),Role.ROLE_MANAGER.name())
                 .requestMatchers(new AntPathRequestMatcher("/api/v1/manager/**")).hasAnyAuthority(Role.ROLE_MANAGER.name())
                 .requestMatchers(new AntPathRequestMatcher("/api/v1/login")).permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/api/v1/add-employee")).permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()

@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.naming.factory.BeanFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.beans.BeanProperty;
@@ -25,13 +26,14 @@ import java.util.Map;
 @AllArgsConstructor
 public class EmployeeController {
     private EmployeeService employeeService;
+    private PasswordEncoder passwordEncoder;
     @GetMapping("/employees")
     public List<Employee> findEmployee() {
             return employeeService.getAllEmployeeWithRoleEmployee();
 
 
     }
-        @GetMapping("/manager")
+        @GetMapping("/managers")
         public List<Employee> findAllEmployee(){
             List<Employee> employeeList = (List<Employee>) employeeService.findAll();
             return employeeList;
@@ -45,16 +47,16 @@ public class EmployeeController {
         return ResponseEntity.ok().body(employee);
     }
 
-    @GetMapping("/employee/{id}")
-    public ResponseEntity<Employee> findEmployeeById(@PathVariable Long  id) throws ResourceNotFoundExeption {
+    @GetMapping("/employee/{account}")
+    public ResponseEntity<Employee> findEmployeeByAccount(@PathVariable String  account) throws ResourceNotFoundExeption {
         System.out.println("abc");
-        Employee employee = employeeService.findById(id).orElseThrow(()-> new ResourceNotFoundExeption("Employee is not found"));
+        Employee employee = employeeService.findByAccount(account).orElseThrow(()-> new ResourceNotFoundExeption("Employee is not found"));
         return  ResponseEntity.ok().body(employee);
 
     }
-    @PutMapping("/update-employee/{id}")
-    public ResponseEntity<Employee> updateEmployeeId(@PathVariable Long id,@Valid @RequestBody EmployeeDto employeeDto) throws ResourceNotFoundExeption{
-        Employee employee= employeeService.findById(id).orElseThrow(()->new ResourceNotFoundExeption("Employee is not found"));
+    @PutMapping("/update-employee/{account}")
+    public ResponseEntity<Employee> updateEmployeeId(@PathVariable String account,@Valid @RequestBody EmployeeDto employeeDto) throws ResourceNotFoundExeption{
+        Employee employee= employeeService.findByAccount(account).orElseThrow(()->new ResourceNotFoundExeption("Employee is not found"));
             if(!StringUtils.isBlank(employeeDto.getFirstName())){
                 employee.setFirstName(employeeDto.getFirstName());
             }else
@@ -77,7 +79,7 @@ public class EmployeeController {
             }
 
             if(!StringUtils.isBlank(employeeDto.getPassword())){
-            employee.setPassword(employeeDto.getPassword());
+            employee.setPassword(passwordEncoder.encode(employeeDto.getPassword()));
             }else
             {
             employee.setPassword(employee.getPassword());
@@ -89,16 +91,17 @@ public class EmployeeController {
             {
             employee.setAccount(employee.getAccount());
             }
-            employeeService.save(employee);
+            employeeService.update(employee);
             return ResponseEntity.ok().body(employee);
 
     }
-    @DeleteMapping("/deleted-employee/{id}")
-    public Map<Employee,Boolean> deletedEmployeeById(@PathVariable Long id) throws ResourceNotFoundExeption{
-        Employee employee = employeeService.findById(id).orElseThrow(()->new ResourceNotFoundExeption("Employee not found"));
+    @DeleteMapping("/deleted-employee/{account}")
+    public Map<Employee,Boolean> deletedEmployeeById(@PathVariable String account) throws ResourceNotFoundExeption{
+
+        Employee employee = employeeService.findByAccount(account).orElseThrow(()->new ResourceNotFoundExeption("Employee not found"));
         Map<Employee,Boolean> map = new HashMap<>();
         map.put(employee,true);
-        employeeService.deleteById(id);
+        employeeService.deleteById(employee.getId());
         return map;
 
     }
