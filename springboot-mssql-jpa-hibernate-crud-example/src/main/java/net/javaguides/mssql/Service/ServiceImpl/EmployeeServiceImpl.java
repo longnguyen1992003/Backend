@@ -6,6 +6,8 @@ import net.javaguides.mssql.Entity.Employee;
 import net.javaguides.mssql.Enum.Role;
 import net.javaguides.mssql.Repository.EmployeeRepository;
 import net.javaguides.mssql.Service.EmployeeService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -57,18 +59,23 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public List<Employee> employeeSearchWithRoleManage(String param) {
-        return employeeRepository.searchEmployeeByStringWithRoleManage(param);
+    public Page<Employee> findAllEmployee(int page, int size) {
+        return  employeeRepository.findAllEmployee(PageRequest.of(page,size));
     }
 
     @Override
-    public List<Employee> employeeSearchWithRoleEmployee(String param) {
-        return employeeRepository.searchEmployeeByStringWithRoleEmployee(param);
+    public Page<Employee> employeeSearchWithRoleManage(String param,int page,int size) {
+        return employeeRepository.searchEmployeeByStringWithRoleManage(param,PageRequest.of(page,size));
     }
 
     @Override
-    public List<Employee> getAllEmployeeWithRoleEmployee() {
-        return employeeRepository.listEmployeeWithRoleEmployee();
+    public Page<Employee> employeeSearchWithRoleEmployee(String param, int page, int size) {
+        return employeeRepository.searchEmployeeByStringWithRoleEmployee(param,PageRequest.of(page,size));
+    }
+
+    @Override
+    public Page<Employee> getAllEmployeeWithRoleEmployee(int size,int pageNo) {
+        return employeeRepository.listEmployeeWithRoleEmployee(PageRequest.of(pageNo,size));
     }
 
     @Override

@@ -12,11 +12,13 @@ import net.javaguides.mssql.Service.EmployeeService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.naming.factory.BeanFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.beans.BeanProperty;
+import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,14 +30,14 @@ public class EmployeeController {
     private EmployeeService employeeService;
     private PasswordEncoder passwordEncoder;
     @GetMapping("/employees")
-    public List<Employee> findEmployee() {
-            return employeeService.getAllEmployeeWithRoleEmployee();
+    public Page<Employee> findEmployee(@RequestParam(defaultValue = "2",value = "size") Integer size,@RequestParam(value = "page",defaultValue = "0") Integer page) {
+            return employeeService.getAllEmployeeWithRoleEmployee(size,page);
 
 
     }
         @GetMapping("/managers")
-        public List<Employee> findAllEmployee(){
-            List<Employee> employeeList = (List<Employee>) employeeService.findAll();
+        public Page<Employee> findAllEmployee(@RequestParam(value = "page",defaultValue = "0") int page,@RequestParam(value = "size",defaultValue = "2")int size){
+            Page<Employee> employeeList =  employeeService.findAllEmployee(page,size);
             return employeeList;
         }
 
@@ -106,17 +108,19 @@ public class EmployeeController {
 
     }
     @GetMapping("/search")
-    public  ResponseEntity<List<Employee>> resultSearchEmployee(@RequestParam("param") String param){
+    public  ResponseEntity<Page<Employee>> resultSearchEmployee(@RequestParam("param") String param,
+                                                                @RequestParam(value = "page",defaultValue = "0") int page,
+                                                                @RequestParam(value = "size",defaultValue = "2") int size){
         Employee employee = getCurrentByAccount();
         System.out.println(employee.getRole());
         System.out.println(employee.getAccount());
         String roleCurrent = employee.getRole().toString();
         if (roleCurrent.equals(Role.ROLE_EMPLOYEE.toString())){
             System.out.println("if");
-            return ResponseEntity.ok().body(employeeService.employeeSearchWithRoleEmployee(param));
+            return ResponseEntity.ok().body(employeeService.employeeSearchWithRoleEmployee(param,page,size));
         }
         System.out.println("else");
-        return ResponseEntity.ok().body(employeeService.employeeSearchWithRoleManage(param));
+        return ResponseEntity.ok().body(employeeService.employeeSearchWithRoleManage(param,page,size));
 
     }
     public  Employee getCurrentByAccount(){

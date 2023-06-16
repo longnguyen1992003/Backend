@@ -3,6 +3,7 @@ package net.javaguides.mssql.Entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import net.javaguides.mssql.Enum.Role;
 
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@SuperBuilder
 @Entity
 public class Employee {
     @Id
