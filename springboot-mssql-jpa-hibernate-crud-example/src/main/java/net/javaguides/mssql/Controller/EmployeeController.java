@@ -8,11 +8,14 @@ import net.javaguides.mssql.Enum.Role;
 import net.javaguides.mssql.Exeption.ResourceNotFoundExeption;
 import net.javaguides.mssql.Repository.EmployeeRepository;
 import net.javaguides.mssql.Securirty.SecutityUltis;
+import net.javaguides.mssql.Securirty.TokenProvider;
 import net.javaguides.mssql.Service.EmployeeService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.naming.factory.BeanFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +25,7 @@ import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -29,6 +33,7 @@ import java.util.Map;
 public class EmployeeController {
     private EmployeeService employeeService;
     private PasswordEncoder passwordEncoder;
+    private TokenProvider tokenProvider;
     @GetMapping("/employees")
     public Page<Employee> findEmployee(@RequestParam(defaultValue = "2",value = "size") Integer size,@RequestParam(value = "page",defaultValue = "0") Integer page) {
             return employeeService.getAllEmployeeWithRoleEmployee(size,page);
@@ -42,8 +47,20 @@ public class EmployeeController {
         }
 
     @PostMapping("/add-employee")
-    public ResponseEntity<Employee> addEmployee(@Valid @RequestBody EmployeeDto employeeDto) {
+    public ResponseEntity<Employee> addEmployee(@Valid @RequestBody EmployeeDto employeeDto) throws ResourceNotFoundExeption {
         Employee employee = new Employee();
+        boolean employeeCheckAccount= employeeService.findByAccount(employeeDto.getAccount()).isPresent();
+        Employee employeeCheckEmail = employeeService.findEmployeeByEmail(employeeDto.getEmailId());
+        Map<String,String> messeage = new HashMap<>();
+
+        if (employeeCheckAccount){
+            messeage.put("message","Account is exist");
+            return new ResponseEntity(messeage, HttpStatus.BAD_REQUEST);
+        }
+        if (employeeCheckEmail!=null){
+            messeage.put("message","Email is exist");
+            return  new ResponseEntity(messeage,HttpStatus.BAD_REQUEST);
+        }
         BeanUtils.copyProperties(employeeDto,employee);
         employeeService.save(employee);
         return ResponseEntity.ok().body(employee);
@@ -59,6 +76,17 @@ public class EmployeeController {
     @PutMapping("/update-employee/{account}")
     public ResponseEntity<Employee> updateEmployeeId(@PathVariable String account,@Valid @RequestBody EmployeeDto employeeDto) throws ResourceNotFoundExeption{
         Employee employee= employeeService.findByAccount(account).orElseThrow(()->new ResourceNotFoundExeption("Employee is not found"));
+        boolean employeeCheckAccount= employeeService.findByAccount(employeeDto.getAccount()).isPresent();
+        Employee employeeCheckEmail = employeeService.findEmployeeByEmail(employeeDto.getEmailId());
+        Map<String,String> messeage = new HashMap<>();
+        if (!SecutityUltis.getCurrentAccountLogin().get().equals(employeeDto.getAccount()) && employeeCheckAccount  ){
+            messeage.put("message","Account is exist");
+            return new ResponseEntity(messeage, HttpStatus.BAD_REQUEST);
+        }
+        if (employeeCheckEmail!=null){
+            messeage.put("message","Email is exist");
+            return  new ResponseEntity(messeage,HttpStatus.BAD_REQUEST);
+        }
             if(!StringUtils.isBlank(employeeDto.getFirstName())){
                 employee.setFirstName(employeeDto.getFirstName());
             }else

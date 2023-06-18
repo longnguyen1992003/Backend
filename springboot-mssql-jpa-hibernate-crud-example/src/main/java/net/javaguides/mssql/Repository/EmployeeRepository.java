@@ -60,6 +60,7 @@ public interface EmployeeRepository extends CrudRepository<Employee, Long>, Pagi
             countQuery = "SELECT  count(E.id) from Employee as E",
             nativeQuery = true)
     Page<Employee> findAllEmployee(Pageable pageable);
+    Employee findByEmailId(String email);
 
 
 

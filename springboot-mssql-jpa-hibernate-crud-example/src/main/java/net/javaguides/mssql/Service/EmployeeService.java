@@ -21,6 +21,7 @@ public interface EmployeeService {
 
     void deleteById(Long id);
     Employee findEmployeeByAccount(String account);
+    Employee findEmployeeByEmail(String email);
 
     Page<Employee> findAllEmployee(int page, int size);
 
