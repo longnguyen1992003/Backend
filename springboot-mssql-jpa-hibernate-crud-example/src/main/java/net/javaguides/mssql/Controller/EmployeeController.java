@@ -40,6 +40,11 @@ public class EmployeeController {
 
 
     }
+        @GetMapping("/current")
+        public ResponseEntity<Employee> currentEmployee (){
+            Employee employee = employeeService.findEmployeeByAccount(SecutityUltis.getCurrentAccountLogin().get());
+            return  ResponseEntity.ok().body(employee);
+        }
         @GetMapping("/managers")
         public Page<Employee> findAllEmployee(@RequestParam(value = "page",defaultValue = "0") int page,@RequestParam(value = "size",defaultValue = "2")int size){
             Page<Employee> employeeList =  employeeService.findAllEmployee(page,size);
@@ -54,17 +59,18 @@ public class EmployeeController {
         Map<String,String> messeage = new HashMap<>();
 
         if (employeeCheckAccount){
-            messeage.put("message","Account is exist");
-            return new ResponseEntity(messeage, HttpStatus.BAD_REQUEST);
+            messeage.put("message","AccountExist");
+            return new ResponseEntity(messeage, HttpStatus.OK);
         }
         if (employeeCheckEmail!=null){
-            messeage.put("message","Email is exist");
-            return  new ResponseEntity(messeage,HttpStatus.BAD_REQUEST);
+            messeage.put("message","EmailExist");
+            return  new ResponseEntity(messeage,HttpStatus.OK);
         }
         BeanUtils.copyProperties(employeeDto,employee);
         employeeService.save(employee);
         return ResponseEntity.ok().body(employee);
     }
+
 
     @GetMapping("/employee/{account}")
     public ResponseEntity<Employee> findEmployeeByAccount(@PathVariable String  account) throws ResourceNotFoundExeption {
@@ -80,11 +86,11 @@ public class EmployeeController {
         Employee employeeCheckEmail = employeeService.findEmployeeByEmail(employeeDto.getEmailId());
         Map<String,String> messeage = new HashMap<>();
         if (!SecutityUltis.getCurrentAccountLogin().get().equals(employeeDto.getAccount()) && employeeCheckAccount  ){
-            messeage.put("message","Account is exist");
+            messeage.put("message","AccountExist");
             return new ResponseEntity(messeage, HttpStatus.BAD_REQUEST);
         }
-        if (employeeCheckEmail!=null){
-            messeage.put("message","Email is exist");
+        if (!employeeCheckEmail.equals(employeeDto.getEmailId()) && employeeCheckEmail!=null){
+            messeage.put("message","EmailExist");
             return  new ResponseEntity(messeage,HttpStatus.BAD_REQUEST);
         }
             if(!StringUtils.isBlank(employeeDto.getFirstName())){
