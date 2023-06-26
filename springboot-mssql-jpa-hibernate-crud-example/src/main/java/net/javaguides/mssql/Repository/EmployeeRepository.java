@@ -1,6 +1,7 @@
 package net.javaguides.mssql.Repository;
 
 import net.javaguides.mssql.Entity.Employee;
+import net.javaguides.mssql.Enum.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -14,52 +15,27 @@ import java.util.function.Predicate;
 
 @Repository
 public interface EmployeeRepository extends CrudRepository<Employee, Long>, PagingAndSortingRepository<Employee,Long> {
-    @Query(value = "select * from Employee AS E " +
-            "  "+
-            "where " +
-            "E.first_name like CONCAT('%',:param,'%') or" +
-            " E.last_name like CONCAT('%',:param,'%')",
-            countQuery = "select count(E.id) from Employee as E" +
-                    "  "+
-                    "where " +
-                    "E.first_name like CONCAT('%',:param,'%') or" +
-                    " E.last_name like CONCAT('%',:param,'%')",
-            nativeQuery = true)
+    @Query(value = "select e from Employee AS e where e.firstName like concat('%',:param,'%') or e.lastName like  concat('%',:param,'%') ")
     Page<Employee> searchEmployeeByStringWithRoleManage(String param,Pageable pageable);
-    @Query(value = "select * from Employee AS E " +
+    @Query(value = "select e from Employee AS e " +
             "  "+
             "where" +
-            " E.role='ROLE_EMPLOYEE' and" +
-            " (E.first_name like CONCAT('%',:param,'%')  or" +
-            " E.last_name like CONCAT('%',:param,'%'))",
-            countQuery = "select count(E.id) from Employee as E " +
-                    "  "+
-                    "where " +
-                    "E.role='ROLE_EMPLOYEE' " +
-                    "and " +
-                    "((E.first_name like CONCAT('%',:param,'%')" +
-                    "or " +
-                    "(E.last_name like CONCAT('%',:param,'%'))))",
-            nativeQuery = true)
-    Page<Employee> searchEmployeeByStringWithRoleEmployee(String param,Pageable pageable);
+            " e.role= :role and" +
+            " (e.firstName like CONCAT('%',:param,'%')  or" +
+            " e.lastName like CONCAT('%',:param,'%'))"
+            )
+    Page<Employee> searchEmployeeByStringWithRoleEmployee(String param,Pageable pageable,Role role);
 
-    @Query(value = "select * from Employee AS E " +
+    @Query(value = "SELECT e FROM Employee e  " +
             "  "+
             "where" +
-            " E.role='ROLE_EMPLOYEE' " ,
-            countQuery = "select count (E.id) from Employee as E" +
-                    "  "+
-                    "where" +
-                    "  "+
-                    "E.role='ROLE_EMPLOYEE'",
-            nativeQuery = true)
-    Page<Employee> listEmployeeWithRoleEmployee(Pageable pageable);
+            " e.role= :role "
+        )
+    Page<Employee> listEmployeeWithRoleEmployee(Pageable pageable, Role role);
     Optional<Employee> findByAccount(String account);
 
-    @Query(value = "select * from Employee ",
-            countQuery = "SELECT  count(E.id) from Employee as E",
-            nativeQuery = true)
-    Page<Employee> findAllEmployee(Pageable pageable);
+
+    Page<Employee> findAll(Pageable pageable);
     Employee findByEmailId(String email);
 
 

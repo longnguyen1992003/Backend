@@ -47,6 +47,5 @@ public class LoginController  {
         String idEmployee = SecutityUltis.getCurrentAccountLogin().orElseThrow( IllegalArgumentException::new);
         Employee employee = employeeService.findEmployeeByAccount(idEmployee);
         return  employee;
-
     }
 }

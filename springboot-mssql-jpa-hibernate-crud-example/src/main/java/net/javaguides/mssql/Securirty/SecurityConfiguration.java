@@ -45,7 +45,7 @@ public class SecurityConfiguration  {
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         source.registerCorsConfiguration("/**", config);
-        System.out.println("CorsFilter");
+
 
         return new org.springframework.web.filter.CorsFilter(source);
     }
@@ -63,9 +63,12 @@ public class SecurityConfiguration  {
                 .and()
                 .authorizeHttpRequests()
                 .requestMatchers(new AntPathRequestMatcher("/api/v1/employees/**")).hasAnyAuthority(Role.ROLE_EMPLOYEE.name(),Role.ROLE_MANAGER.name())
-                .requestMatchers(new AntPathRequestMatcher("/api/v1/manager/**")).hasAnyAuthority(Role.ROLE_MANAGER.name())
+                .requestMatchers(new AntPathRequestMatcher("/api/v1/managers/**")).hasAnyAuthority(Role.ROLE_MANAGER.name())
+                .requestMatchers(new AntPathRequestMatcher("/api/v1/deleted-employee/**")).hasAuthority(Role.ROLE_MANAGER.name())
+                .requestMatchers(new AntPathRequestMatcher("/api/v1/update-employee/**")).hasAuthority(Role.ROLE_MANAGER.name())
                 .requestMatchers(new AntPathRequestMatcher("/api/v1/login")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/api/v1/add-employee")).permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/api/v1/details/**")).hasAuthority(Role.ROLE_MANAGER.name())
                 .anyRequest()
                 .authenticated()
                 .and()

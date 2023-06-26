@@ -2,6 +2,7 @@ package net.javaguides.mssql.Service;
 
 import net.javaguides.mssql.EmployeeDto.ListEmployeeResponeDto;
 import net.javaguides.mssql.Entity.Employee;
+import net.javaguides.mssql.Enum.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -26,9 +27,9 @@ public interface EmployeeService {
     Page<Employee> findAllEmployee(int page, int size);
 
     Page<Employee> employeeSearchWithRoleManage(String param,int size,int pageNo);
-    Page<Employee> employeeSearchWithRoleEmployee(String param,int size,int pageNo);
-    Page<Employee> getAllEmployeeWithRoleEmployee(int size,int pageNo);
-    ListEmployeeResponeDto getAllEmployee(long pageNo,int pageSize,String sortBy,String sortDir);
+    Page<Employee> employeeSearchWithRoleEmployee(String param,int size,int pageNo,Role role);
+    Page<Employee> getAllEmployeeWithRoleEmployee(int size, int pageNo, Role role);
+
 
 
 }

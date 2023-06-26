@@ -65,7 +65,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Page<Employee> findAllEmployee(int page, int size) {
-        return  employeeRepository.findAllEmployee(PageRequest.of(page,size));
+        return  employeeRepository.findAll(PageRequest.of(page,size));
     }
 
     @Override
@@ -74,17 +74,17 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Page<Employee> employeeSearchWithRoleEmployee(String param, int page, int size) {
-        return employeeRepository.searchEmployeeByStringWithRoleEmployee(param,PageRequest.of(page,size));
+    public Page<Employee> employeeSearchWithRoleEmployee(String param, int page, int size,Role role) {
+        return employeeRepository.searchEmployeeByStringWithRoleEmployee(param,PageRequest.of(page,size),role);
     }
 
     @Override
-    public Page<Employee> getAllEmployeeWithRoleEmployee(int size,int pageNo) {
-        return employeeRepository.listEmployeeWithRoleEmployee(PageRequest.of(pageNo,size));
+    public Page<Employee> getAllEmployeeWithRoleEmployee(int pageNo,int size,Role role) {
+        return employeeRepository.listEmployeeWithRoleEmployee(PageRequest.of(pageNo,size),role);
     }
 
-    @Override
-    public ListEmployeeResponeDto getAllEmployee(long pageNo, int pageSize, String sortBy, String sortDir) {
-        return null;
-    }
+//    @Override
+//    public ListEmployeeResponeDto getAllEmployee(long pageNo, int pageSize, String sortBy, String sortDir) {
+//        return null;
+//    }
 }

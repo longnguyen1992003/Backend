@@ -24,7 +24,7 @@ public class SecutityUltis {
                 UserDetails userDetails = (UserDetails) authentication.getPrincipal();
                 return String.valueOf(userDetails.getUsername());
             }
-                if (authentication.getPrincipal() instanceof  Long){
+                if (authentication.getPrincipal() instanceof  String){
                     return  String.valueOf(authentication.getPrincipal().toString());
                 }
             }

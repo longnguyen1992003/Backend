@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.javaguides.mssql.Enum.Role;
+
+import java.time.LocalDate;
+
 @Setter
 @Getter
 @AllArgsConstructor
@@ -17,4 +20,6 @@ public class ListEmployeeDto {
     private String account;
     private String password;
     private Role role;
+    private LocalDate dateOfBirth;
+    private Long age;
 }

@@ -23,13 +23,13 @@ import java.util.stream.Collectors;
 @Component
 public class TokenProvider {
 
-    @Value("YRYUYRE&34234jvhfue47fh")
+    @Value("${secret.key}")
     private String secretKey;
 
-    @Value("180")
+    @Value("${access.token.expired}")
     private Integer accessTokenExpireTime;
 
-    @Value("3600")
+    @Value("${refresh.token.expired}")
     private Integer refreshTokenExpireTime;
 
 
@@ -41,14 +41,15 @@ public class TokenProvider {
         Map<String, Object> claims = new HashMap<>();
         claims.put(SecurityConstant.TOKEN_TYPE, (String)Token_Type.ACCESS_TOKEN.toString());
         claims.put(SecurityConstant.AUTHORITIES_KEY,authorities);
-
-
+        Map<String, Object> header = new HashMap<>();
+        header.put("typ","JWT");
         LocalDateTime exp = LocalDateTime.now().plusMinutes(accessTokenExpireTime);
         Date expToken = Date.from(exp.atZone(ZoneId.systemDefault()).toInstant());
         return Jwts.builder()
                 .setSubject(authentication.getName()) // Account
                 .addClaims(claims)
                 .setExpiration(expToken)
+                .setHeader(header)
                 .signWith(SignatureAlgorithm.HS512, secretKey)
                 .compact();
     }
@@ -65,9 +66,8 @@ public class TokenProvider {
                 .setExpiration(expireDdate)
                 .signWith(SignatureAlgorithm.HS256,secretKey)
                 .compact();
-
-
     }
+
     public Authentication getAuthentication(String accessToken) {
         if (!StringUtils.hasText(accessToken)) {
             return null;
