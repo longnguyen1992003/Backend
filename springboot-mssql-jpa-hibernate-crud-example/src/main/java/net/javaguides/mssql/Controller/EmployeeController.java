@@ -30,6 +30,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -69,8 +71,6 @@ public class EmployeeController {
 
     @PostMapping("/add-employee")
     public ResponseEntity<Employee> addEmployee(@Valid @RequestBody EmployeeDto employeeDto) throws ResourceNotFoundExeption {
-        System.out.println(employeeDto.getAccount().toString());
-        System.out.println();
         Employee employee = new Employee();
         Optional<Employee> employeeCheckAccount = employeeService.findByAccount(employeeDto.getAccount());
         Employee employeeCheckEmail = employeeService.findEmployeeByEmail(employeeDto.getEmailId());
@@ -95,7 +95,26 @@ public class EmployeeController {
             message.put("message", "EmailExist");
             return new ResponseEntity(message, HttpStatus.OK);
         }
-
+        Pattern patternEmail = Pattern.compile("(\\W|^)[\\w.+\\-]*@gmail\\.com(\\W|$)");
+        if (!employeeDto.getEmailId().isEmpty()) {
+            Matcher matcher=patternEmail.matcher(employeeDto.getEmailId());
+            if (!matcher.matches()) {
+                return new ResponseEntity("Please enter email with format true.", HttpStatus.BAD_REQUEST);
+            }
+        }
+        Pattern pattern = Pattern.compile("^[a-zA-Z ]*$");
+        if (!employeeDto.getFirstName().isEmpty()) {
+            Matcher matcher=pattern.matcher(employeeDto.getFirstName());
+            if (!matcher.matches()) {
+                return new ResponseEntity("Please enter first name cannot included number.", HttpStatus.BAD_REQUEST);
+            }
+        }
+        if (!employeeDto.getLastName().isEmpty()) {
+            Matcher matcher=pattern.matcher(employeeDto.getLastName());
+            if (!matcher.matches() ) {
+                return new ResponseEntity("Please enter first name cannot included number.", HttpStatus.BAD_REQUEST);
+            }
+        }
         if (employeeDto.getDateOfBirth() != null) {
             employeeDto.getDateOfBirth().format(DateTimeFormatter.ofPattern("YYYY-MM-DD"));
         }
@@ -134,9 +153,7 @@ public class EmployeeController {
     public ResponseEntity<Employee> updateEmployeeById(@Valid @RequestBody EmployeeDto employeeDto,@PathVariable(value = "id") Long id) throws ResourceNotFoundExeption {
 
         Employee employeeCurrent = getCurrentByAccount();
-        System.out.println(id);
         Employee employee = employeeService.findById(id).orElseThrow(() -> new ResourceNotFoundExeption("Employee is not found"));
-        System.out.println(employee.getId());
         boolean employeeCheckAccount = employeeService.findByAccount(employeeDto.getAccount()).isPresent();
         Employee employeeCheckEmail = employeeService.findEmployeeByEmail(employeeDto.getEmailId());
         Map<String, String> messeage = new HashMap<>();
@@ -155,23 +172,44 @@ public class EmployeeController {
         }
         if (!employeeDto.getEmailId().isEmpty()) {
             if ( employeeCheckEmail!=null&&!employee.getEmailId().equals(employeeDto.getEmailId()) ) {
-
-                System.out.println(employeeCheckEmail.getEmailId());
-                System.out.println(employeeDto.getEmailId());
                 messeage.put("message", "EmailExist");
                 return new ResponseEntity(messeage, HttpStatus.OK);
             }
         }
         if (employeeDto.getAge() != null) {
             if (employeeDto.getAge() < 1 || employeeDto.getAge() > 100) {
-                System.out.println("age");
                 return new ResponseEntity("Age is less than 100 and more than 1 ", HttpStatus.BAD_REQUEST);
+            }
+        }
+        if (!employeeDto.getAccount().isEmpty()) {
+            if (employeeDto.getAccount().length() < 10 ) {
+                return new ResponseEntity("Account is length more than 10", HttpStatus.BAD_REQUEST);
+            }
+        }
+        Pattern patternEmail = Pattern.compile("(\\W|^)[\\w.+\\-]*@gmail\\.com(\\W|$)");
+        if (!employeeDto.getEmailId().isEmpty()) {
+            Matcher matcher=patternEmail.matcher(employeeDto.getEmailId());
+            if (!matcher.matches()) {
+                return new ResponseEntity("Please enter email with format true.", HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        Pattern pattern = Pattern.compile("^[a-zA-Z ]*$");
+        if (!employeeDto.getFirstName().isEmpty()) {
+            Matcher matcher=pattern.matcher(employeeDto.getFirstName());
+            if (!matcher.matches()) {
+                return new ResponseEntity("Please enter first name cannot included number.", HttpStatus.BAD_REQUEST);
+            }
+        }
+        if (!employeeDto.getLastName().isEmpty()) {
+            Matcher matcher=pattern.matcher(employeeDto.getLastName());
+            if (!matcher.matches() ) {
+                return new ResponseEntity("Please enter first name cannot included number.", HttpStatus.BAD_REQUEST);
             }
         }
 
         if (employeeDto.getDateOfBirth() != null) {
             if (employeeDto.getDateOfBirth().isAfter(LocalDate.now())) {
-                System.out.println("dob");
                 return new ResponseEntity("Date Of Birth is less than date now and enter with format YYYY-MM-DD ", HttpStatus.BAD_REQUEST);
             }
         }
@@ -240,24 +278,39 @@ public class EmployeeController {
         }
         if (!employeeDto.getEmailId().isEmpty()) {
             if ( employeeCheckEmail!=null&&!employee.getEmailId().equals(employeeDto.getEmailId()) ) {
-
-                System.out.println(employeeCheckEmail.getEmailId());
-                System.out.println(employeeDto.getEmailId());
                 messeage.put("message", "EmailExist");
                 return new ResponseEntity(messeage, HttpStatus.OK);
             }
         }
         if (employeeDto.getAge() != null) {
             if (employeeDto.getAge() < 1 || employeeDto.getAge() > 100) {
-                System.out.println("age");
                 return new ResponseEntity("Age is less than 100 and more than 1 ", HttpStatus.BAD_REQUEST);
             }
         }
 
         if (employeeDto.getDateOfBirth() != null) {
             if (employeeDto.getDateOfBirth().isAfter(LocalDate.now())) {
-                System.out.println("dob");
                 return new ResponseEntity("Date Of Birth is less than date now and enter with format YYYY-MM-DD ", HttpStatus.BAD_REQUEST);
+            }
+        }
+        Pattern patternEmail = Pattern.compile("(\\W|^)[\\w.+\\-]*@gmail\\.com(\\W|$)");
+        if (!employeeDto.getEmailId().isEmpty()) {
+            Matcher matcher=patternEmail.matcher(employeeDto.getEmailId());
+            if (!matcher.matches()) {
+                return new ResponseEntity("Please enter email with format true.", HttpStatus.BAD_REQUEST);
+            }
+        }
+        Pattern pattern = Pattern.compile("^[a-zA-Z ]*$");
+        if (!employeeDto.getFirstName().isEmpty()) {
+            Matcher matcher=pattern.matcher(employeeDto.getFirstName());
+            if (!matcher.matches()) {
+                return new ResponseEntity("Please enter first name cannot included number.", HttpStatus.BAD_REQUEST);
+            }
+        }
+        if (!employeeDto.getLastName().isEmpty()) {
+            Matcher matcher=pattern.matcher(employeeDto.getLastName());
+            if (!matcher.matches() ) {
+                return new ResponseEntity("Please enter first name cannot included number.", HttpStatus.BAD_REQUEST);
             }
         }
 
